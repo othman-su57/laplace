@@ -23,22 +23,41 @@ ChartJS.register(
   Legend
 );
 
-export default function FourierProbeSimulator() {
+export default function FourierProbeSimulator({ lang = 'ar' }) {
   const [probeFreq, setProbeFreq] = useState(1);
   const hiddenFreq = 3; // The secret frequency we are looking for
+
+  const t = {
+    ar: {
+      title: 'فورييه وصيد الترددات',
+      signalTitle: 'الإشارة المشوشة والمسبار (Probe)',
+      resonanceTitle: 'قوة الرنين (التكامل)',
+      probeFreq: 'تردد المسبار (ω): ',
+      resonanceVal: 'استجابة الرنين: ',
+      desc: 'حرّك شريط التمرير للبحث عن التردد الخفي داخل الإشارة المشوشة. عندما يطابق تردد المسبار التردد الخفي، سيحدث رنين (Spike).'
+    },
+    en: {
+      title: 'Fourier and Frequency Hunting',
+      signalTitle: 'Noisy Signal and Probe',
+      resonanceTitle: 'Resonance Strength (Integral)',
+      probeFreq: 'Probe Frequency (ω): ',
+      resonanceVal: 'Resonance Response: ',
+      desc: 'Move the slider to search for the hidden frequency inside the noisy signal. When the probe frequency matches the hidden frequency, a resonance spike occurs.'
+    }
+  }[lang] || t.ar;
 
   const resolution = 300;
   const timeEnd = 10;
   const labels = Array.from({ length: resolution }, (_, i) => (i * timeEnd) / resolution);
   
   // Noisy signal with hidden frequency
-  const signalData = labels.map(t => Math.sin(hiddenFreq * t) + 0.5 * Math.sin(10 * t) + (Math.random() - 0.5));
+  const signalData = labels.map(time => Math.sin(hiddenFreq * time) + 0.5 * Math.sin(10 * time) + (Math.random() - 0.5));
   
   // Probe signal
-  const probeData = labels.map(t => Math.sin(probeFreq * t));
+  const probeData = labels.map(time => Math.sin(probeFreq * time));
   
   // Product
-  const productData = labels.map((t, i) => signalData[i] * probeData[i]);
+  const productData = labels.map((time, i) => signalData[i] * probeData[i]);
 
   // Integration (Resonance)
   let resonance = 0;
@@ -53,7 +72,7 @@ export default function FourierProbeSimulator() {
     animation: false,
     plugins: {
       legend: { position: 'top', labels: { color: '#f0f0f2' } },
-      title: { display: true, text: 'الإشارة المشوشة والمسبار (Probe)', color: '#00e5ff' },
+      title: { display: true, text: t.signalTitle, color: '#00e5ff' },
     },
     scales: {
       x: { display: false },
@@ -66,7 +85,7 @@ export default function FourierProbeSimulator() {
     animation: { duration: 200 },
     plugins: {
       legend: { display: false },
-      title: { display: true, text: 'قوة الرنين (التكامل)', color: '#00ff66' },
+      title: { display: true, text: t.resonanceTitle, color: '#00ff66' },
     },
     scales: {
       x: { display: false },
@@ -76,7 +95,7 @@ export default function FourierProbeSimulator() {
 
   return (
     <div className="simulator-container">
-      <h3 className="simulator-title">فورييه وصيد الترددات</h3>
+      <h3 className="simulator-title">{t.title}</h3>
       
       <div style={{ height: '200px', marginBottom: '20px' }}>
         <Line 
@@ -109,8 +128,8 @@ export default function FourierProbeSimulator() {
 
       <div className="slider-container">
         <label>
-          <span>تردد المسبار (ω): {probeFreq.toFixed(1)} Hz</span>
-          <span>استجابة الرنين: {resonanceValue.toFixed(2)}</span>
+          <span>{t.probeFreq}{probeFreq.toFixed(1)} Hz</span>
+          <span>{t.resonanceVal}{resonanceValue.toFixed(2)}</span>
         </label>
         <input 
           type="range" 
@@ -122,7 +141,7 @@ export default function FourierProbeSimulator() {
         />
       </div>
       <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.9rem', color: '#a1a3a8' }}>
-        حرّك شريط التمرير للبحث عن التردد الخفي داخل الإشارة المشوشة. عندما يطابق تردد المسبار التردد الخفي، سيحدث رنين (Spike).
+        {t.desc}
       </p>
     </div>
   );

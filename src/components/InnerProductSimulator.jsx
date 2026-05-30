@@ -23,10 +23,31 @@ ChartJS.register(
   Filler
 );
 
-export default function InnerProductSimulator() {
+export default function InnerProductSimulator({ lang = 'ar' }) {
   const [func1, setFunc1] = useState('sin');
   const [func2, setFunc2] = useState('cos');
   const [period, setPeriod] = useState(2 * Math.PI);
+
+  const t = {
+    ar: {
+      title: 'محاكاة التطابق والإسقاط الرياضي',
+      original: 'الدوال الأصلية',
+      product: 'حاصل الضرب f(t) × g(t) والمساحة',
+      period: 'فترة التكامل (T): ',
+      area: 'المساحة الإجمالية (التكامل): ',
+      orthogonal: 'الدالتان متعامدتان (المساحات تلغي بعضها)!',
+      match: 'يوجد تطابق بين الدالتين (التكامل لا يساوي صفر).'
+    },
+    en: {
+      title: 'Similarity and Projection Simulator',
+      original: 'Original Functions',
+      product: 'Product f(t) × g(t) and Area',
+      period: 'Integration Period (T): ',
+      area: 'Total Area (Integral): ',
+      orthogonal: 'Functions are orthogonal (areas cancel out)!',
+      match: 'Functions match (integral is non-zero).'
+    }
+  }[lang] || t.ar;
 
   const getFuncValue = (name, x) => {
     switch (name) {
@@ -55,7 +76,7 @@ export default function InnerProductSimulator() {
     animation: false,
     plugins: {
       legend: { position: 'top', labels: { color: '#f0f0f2' } },
-      title: { display: true, text: 'الدوال الأصلية', color: '#00e5ff' },
+      title: { display: true, text: t.original, color: '#00e5ff' },
     },
     scales: {
       x: { display: false },
@@ -68,7 +89,7 @@ export default function InnerProductSimulator() {
     animation: false,
     plugins: {
       legend: { display: false },
-      title: { display: true, text: 'حاصل الضرب f(t) × g(t) والمساحة', color: '#00e5ff' },
+      title: { display: true, text: t.product, color: '#00e5ff' },
     },
     scales: {
       x: { display: false },
@@ -78,7 +99,7 @@ export default function InnerProductSimulator() {
 
   return (
     <div className="simulator-container">
-      <h3 className="simulator-title">محاكاة التطابق والإسقاط الرياضي</h3>
+      <h3 className="simulator-title">{t.title}</h3>
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', justifyContent: 'center' }}>
         <select value={func1} onChange={e => setFunc1(e.target.value)} style={{ padding: '0.5rem', background: '#1a1d24', color: '#fff', border: '1px solid #2a2d36', borderRadius: '4px' }}>
           <option value="sin">Sin(t)</option>
@@ -127,8 +148,8 @@ export default function InnerProductSimulator() {
 
       <div className="slider-container">
         <label>
-          <span>فترة التكامل (T): {(period / Math.PI).toFixed(2)}π</span>
-          <span>المساحة الإجمالية (التكامل): {integral.toFixed(4)}</span>
+          <span>{t.period}{(period / Math.PI).toFixed(2)}π</span>
+          <span>{t.area}{integral.toFixed(4)}</span>
         </label>
         <input 
           type="range" 
@@ -140,7 +161,7 @@ export default function InnerProductSimulator() {
         />
       </div>
       <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.9rem', color: Math.abs(integral) < 0.1 ? '#00ff66' : '#ff3366' }}>
-        {Math.abs(integral) < 0.1 ? 'الدالتان متعامدتان (المساحات تلغي بعضها)!' : 'يوجد تطابق بين الدالتين (التكامل لا يساوي صفر).'}
+        {Math.abs(integral) < 0.1 ? t.orthogonal : t.match}
       </p>
     </div>
   );

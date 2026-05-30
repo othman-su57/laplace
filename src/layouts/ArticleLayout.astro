@@ -1,20 +1,25 @@
 ---
 import '../styles/global.css';
 
-const { title } = Astro.props;
+const { title, lang = 'ar', dir = 'rtl' } = Astro.props;
+const otherLangUrl = lang === 'ar' ? '/en' : '/';
+const otherLangText = lang === 'ar' ? 'English' : 'العربية';
 ---
 
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang={lang} dir={dir}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="تحويل لابلاس من المبادئ الأولى: تفكيك الخدعة الرياضية التي تروض الأنظمة الديناميكية" />
+    <meta name="description" content={lang === 'ar' ? "تحويل لابلاس من المبادئ الأولى: تفكيك الخدعة الرياضية التي تروض الأنظمة الديناميكية" : "Laplace Transform from First Principles: Demystifying the Mathematical Trick that Tames Dynamical Systems"} />
     <title>{title}</title>
     <!-- KaTeX CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
   </head>
   <body>
+    <div class="lang-toggle-container">
+      <a href={otherLangUrl} class="lang-toggle-btn">{otherLangText}</a>
+    </div>
     <main class="container">
       <slot />
     </main>

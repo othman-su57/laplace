@@ -23,28 +23,53 @@ ChartJS.register(
   Filler
 );
 
-export default function LaplaceDampingSimulator() {
+export default function LaplaceDampingSimulator({ lang = 'ar' }) {
   const [sigma, setSigma] = useState(0); // Damping factor
+
+  const t = {
+    ar: {
+      title: 'مطرقة الإخماد وخريطة الـ S-Plane',
+      chartTitle: 'النظام المنفجر ومطرقة الإخماد',
+      unstableLabel: 'Original Unstable Signal', // Keep or translate, it's mostly english in code already but let's translate
+      dampingLabel: 'Damping Hammer e^(-σt)',
+      resultLabel: 'Resulting Signal',
+      hammerStr: 'قوة المطرقة (σ): ',
+      stable: 'النظام مستقر (يتقارب)',
+      unstable: 'النظام غير مستقر (ينفجر)',
+      desc: 'استخدم شريط التمرير لزيادة قيمة $\\sigma$. لاحظ كيف يتم ثني الإشارة المتضخمة وإجبارها على الانخماد نحو الصفر عندما تصبح قيمة $\\sigma$ أكبر من معدل نمو النظام الأصلي.'
+    },
+    en: {
+      title: 'The Damping Hammer and S-Plane Map',
+      chartTitle: 'The Exploding System and the Damping Hammer',
+      unstableLabel: 'Original Unstable Signal',
+      dampingLabel: 'Damping Hammer e^(-σt)',
+      resultLabel: 'Resulting Signal',
+      hammerStr: 'Hammer Strength (σ): ',
+      stable: 'System is stable (Converges)',
+      unstable: 'System is unstable (Explodes)',
+      desc: 'Use the slider to increase the value of $\\sigma$. Notice how the exploding signal is bent and forced to dampen towards zero when $\\sigma$ becomes greater than the original system\'s growth rate.'
+    }
+  }[lang] || t.ar;
 
   const resolution = 200;
   const timeEnd = 5;
   const labels = Array.from({ length: resolution }, (_, i) => (i * timeEnd) / resolution);
   
   // Unstable system (e.g., e^t * sin(5t))
-  const unstableData = labels.map(t => Math.exp(1 * t) * Math.sin(5 * t));
+  const unstableData = labels.map(time => Math.exp(1 * time) * Math.sin(5 * time));
   
   // Damping hammer (e^-σt)
-  const dampingData = labels.map(t => Math.exp(-sigma * t));
+  const dampingData = labels.map(time => Math.exp(-sigma * time));
   
   // Resulting dampened signal
-  const dampenedData = labels.map((t, i) => unstableData[i] * dampingData[i]);
+  const dampenedData = labels.map((time, i) => unstableData[i] * dampingData[i]);
 
   const lineOptions = {
     responsive: true,
     animation: false,
     plugins: {
       legend: { position: 'top', labels: { color: '#f0f0f2' } },
-      title: { display: true, text: 'النظام المنفجر ومطرقة الإخماد', color: '#00e5ff' },
+      title: { display: true, text: t.chartTitle, color: '#00e5ff' },
     },
     scales: {
       x: { display: false },
@@ -54,7 +79,7 @@ export default function LaplaceDampingSimulator() {
 
   return (
     <div className="simulator-container">
-      <h3 className="simulator-title">مطرقة الإخماد وخريطة الـ S-Plane</h3>
+      <h3 className="simulator-title">{t.title}</h3>
       
       <div style={{ height: '250px', marginBottom: '20px' }}>
         <Line 
@@ -62,9 +87,9 @@ export default function LaplaceDampingSimulator() {
           data={{
             labels,
             datasets: [
-              { label: 'Original Unstable Signal', data: unstableData, borderColor: '#ff3366', borderDash: [5, 5], borderWidth: 1, pointRadius: 0 },
-              { label: 'Damping Hammer e^(-σt)', data: dampingData, borderColor: '#a1a3a8', borderWidth: 1, pointRadius: 0 },
-              { label: 'Resulting Signal', data: dampenedData, borderColor: '#00e5ff', backgroundColor: 'rgba(0, 229, 255, 0.1)', fill: true, borderWidth: 2, pointRadius: 0 },
+              { label: t.unstableLabel, data: unstableData, borderColor: '#ff3366', borderDash: [5, 5], borderWidth: 1, pointRadius: 0 },
+              { label: t.dampingLabel, data: dampingData, borderColor: '#a1a3a8', borderWidth: 1, pointRadius: 0 },
+              { label: t.resultLabel, data: dampenedData, borderColor: '#00e5ff', backgroundColor: 'rgba(0, 229, 255, 0.1)', fill: true, borderWidth: 2, pointRadius: 0 },
             ]
           }} 
         />
@@ -72,8 +97,8 @@ export default function LaplaceDampingSimulator() {
 
       <div className="slider-container">
         <label>
-          <span>قوة المطرقة (σ): {sigma.toFixed(2)}</span>
-          <span style={{ color: sigma > 1 ? '#00ff66' : '#ff3366' }}>{sigma > 1 ? 'النظام مستقر (يتقارب)' : 'النظام غير مستقر (ينفجر)'}</span>
+          <span>{t.hammerStr}{sigma.toFixed(2)}</span>
+          <span style={{ color: sigma > 1 ? '#00ff66' : '#ff3366' }}>{sigma > 1 ? t.stable : t.unstable}</span>
         </label>
         <input 
           type="range" 
@@ -85,7 +110,7 @@ export default function LaplaceDampingSimulator() {
         />
       </div>
       <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.9rem', color: '#a1a3a8' }}>
-        استخدم شريط التمرير لزيادة قيمة $\sigma$. لاحظ كيف يتم ثني الإشارة المتضخمة وإجبارها على الانخماد نحو الصفر عندما تصبح قيمة $\sigma$ أكبر من معدل نمو النظام الأصلي.
+        {t.desc}
       </p>
     </div>
   );
